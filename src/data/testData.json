@@ -1,0 +1,8 @@
+{
+  "api": {
+    "newUser": {
+      "name": "Morpheus QA",
+      "job": "Leader"
+    }
+  }
+}
