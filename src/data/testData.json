@@ -4,5 +4,9 @@
       "name": "Morpheus QA",
       "job": "Leader"
     }
+  },
+  "ui": {
+    "expectedInventoryTitle": "Products",
+    "targetProductName": "Sauce Labs Backpack"
   }
 }
