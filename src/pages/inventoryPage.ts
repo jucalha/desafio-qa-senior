@@ -1,27 +1,47 @@
-import { Page } from '@playwright/test';
-import { BasePage } from './basePage';
+import { Page, Locator } from '@playwright/test';
 
-export class InventoryPage extends BasePage {
-    private readonly title = '.title';
-    private readonly shoppingCartBadge = '.shopping_cart_badge';
+export class InventoryPage {
+    readonly page: Page;
+    readonly cartBadge: Locator;
+    readonly cartLink: Locator;
+    readonly checkoutBtn: Locator;
+    readonly firstNameInput: Locator;
+    readonly lastNameInput: Locator;
+    readonly postalCodeInput: Locator;
+    readonly continueBtn: Locator;
+    readonly finishBtn: Locator;
+    readonly completeHeader: Locator;
 
     constructor(page: Page) {
-        super(page);
+        this.page = page;
+        this.cartBadge = page.locator('.shopping_cart_badge');
+        this.cartLink = page.locator('.shopping_cart_link');
+        this.checkoutBtn = page.locator('[data-test="checkout"]');
+        this.firstNameInput = page.locator('[data-test="firstName"]');
+        this.lastNameInput = page.locator('[data-test="lastName"]');
+        this.postalCodeInput = page.locator('[data-test="postalCode"]');
+        this.continueBtn = page.locator('[data-test="continue"]');
+        this.finishBtn = page.locator('[data-test="finish"]');
+        this.completeHeader = page.locator('.complete-header');
     }
 
-    async getPageTitle() {
-        await this.page.waitForSelector(this.title, { state: 'visible' });
-        return await this.page.textContent(this.title);
+    async adicionarProdutoAoCarrinho(idProduto: string) {
+        await this.page.locator(`[data-test="add-to-cart-${idProduto}"]`).click();
     }
 
-    async addProductToCart(productName: string) {
-        // Encontra o botão de adicionar ao carrinho dinamicamente pelo nome do produto
-        const addToCartBtn = `//div[text()="${productName}"]/ancestor::div[@class="inventory_item"]//button`;
-        await this.click(addToCartBtn);
+    async iniciarCheckout() {
+        await this.cartLink.click();
+        await this.checkoutBtn.click();
     }
 
-    async getCartItemCount() {
-        await this.page.waitForSelector(this.shoppingCartBadge, { state: 'visible' });
-        return await this.page.textContent(this.shoppingCartBadge);
+    async preencherDadosDeEntrega(nome: string, sobrenome: string, cep: string) {
+        await this.firstNameInput.fill(nome);
+        await this.lastNameInput.fill(sobrenome);
+        await this.postalCodeInput.fill(cep);
+        await this.continueBtn.click();
+    }
+
+    async finalizarCompra() {
+        await this.finishBtn.click();
     }
 }

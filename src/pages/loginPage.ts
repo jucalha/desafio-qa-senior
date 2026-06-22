@@ -3,7 +3,6 @@ import { BasePage } from './basePage';
 import { ENV } from '../config/env';
 
 export class LoginPage extends BasePage {
-    // 1. Mapeamento de Seletores Isolados
     private readonly usernameInput = '[data-test="username"]';
     private readonly passwordInput = '[data-test="password"]';
     private readonly loginButton = '[data-test="login-button"]';
@@ -13,7 +12,6 @@ export class LoginPage extends BasePage {
         super(page);
     }
 
-    // 2. Ações Encapsuladas
     async accessSystem() {
         await this.navigate(ENV.BASE_URL_UI);
     }

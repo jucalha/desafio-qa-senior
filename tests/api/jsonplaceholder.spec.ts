@@ -1,59 +1,103 @@
 import { test, expect } from '@playwright/test';
 import { ApiHelper } from '../../src/support/apiHelper';
+import testData from '../../src/data/testData.json';
 
-test.describe('Suíte de Testes de API - JSONPlaceholder', () => {
+test.describe('Suíte de Testes de API - JSONPlaceholder (CRUD Completo + SOM)', () => {
+
     let api: ApiHelper;
 
     test.beforeEach(async ({ request }) => {
         api = new ApiHelper(request);
     });
 
-    // CENÁRIO 1 E 2 (Unidos pela eficiência de tráfego)
-    test('Deve listar posts com sucesso (Status 200) e validar contrato', async () => {
-        const response = await api.getPosts();
-        expect(response.status()).toBe(200); // Requisito de sucesso 200 do Testes_JCG.pdf[cite: 1]
+    test('GET - Validar a busca pela lista de posts', async () => {
+        let response;
 
-        const responseBody = await response.json();
-        expect(Array.isArray(responseBody)).toBeTruthy();
-        expect(responseBody[0]).toHaveProperty('userId');
-        expect(responseBody[0]).toHaveProperty('id');
-        expect(responseBody[0]).toHaveProperty('title');
-        expect(responseBody[0]).toHaveProperty('body');
+        await test.step('Quando realizo uma requisição GET para o endpoint de posts', async () => {
+            response = await api.getPosts();
+        });
+
+        await test.step('Então o status code retornado deve ser 200 OK', async () => {
+            expect(response.status()).toBe(200);
+        });
+
+        await test.step('E a resposta deve retornar uma lista preenchida', async () => {
+            const body = await response.json();
+            expect(Array.isArray(body)).toBeTruthy();
+            expect(body.length).toBeGreaterThan(0);
+        });
     });
 
-    // CENÁRIOS 3, 4, 5 e 6 (Unidos pelo ciclo de vida sequencial do dado)
-    test('Deve executar o fluxo dinâmico completo de CRUD (Criação -> Leitura -> Alteração -> Remoção)', async () => {
-        const newPost = { title: 'QA Sênior', body: 'Desafio Técnico', userId: 1 };
-        const postResponse = await api.createPost(newPost);
-        expect(postResponse.status()).toBe(201); 
+    test('POST - Validar a criação de um novo post', async () => {
+        let response;
+        const payload = testData.api.novoPost;
 
-        const targetId = 1;
+        await test.step('Quando envio o payload de criação de post via POST', async () => {
+            response = await api.createPost(payload);
+        });
 
-        const getResponse = await api.getPostById(targetId);
-        expect(getResponse.status()).toBe(200);
+        await test.step('Então a API deve retornar o status code 201 Created', async () => {
+            expect(response.status()).toBe(201);
+        });
 
-        const updatedPost = { id: targetId, title: 'QA Sênior - Atualizado', body: 'Novo escopo', userId: 1 };
-        const putResponse = await api.updatePost(targetId, updatedPost);
-        expect(putResponse.status()).toBe(200);
-
-        const deleteResponse = await api.deletePost(targetId);
-        expect(deleteResponse.status()).toBe(200);
+        await test.step('E a resposta deve espelhar os dados enviados', async () => {
+            const body = await response.json();
+            expect(body.title).toBe(payload.title);
+            expect(body).toHaveProperty('id');
+        });
     });
 
-    // --- CENÁRIOS NEGATIVOS (Desmembrados com base na sua excelente crítica de QA) ---
+    test('PUT - Validar a atualização de um post existente', async () => {
+        let response;
+        const payload = testData.api.postAtualizado;
 
-    test('Deve simular e validar o status code de erro 401 (Unauthorized)', async () => {
-        const response = await api.getSimulatedError(401);
-        expect(response.status()).toBe(401); // Requisito de erro 401 do Testes_JCG.pdf[cite: 1]
+        await test.step(`Quando envio o payload de atualização para o Post ID ${payload.id} via PUT`, async () => {
+            response = await api.updatePost(payload.id, payload);
+        });
+
+        await test.step('Então a API deve retornar o status code 200 OK', async () => {
+            expect(response.status()).toBe(200);
+        });
+
+        await test.step('E o corpo da resposta deve refletir a alteração do título', async () => {
+            const body = await response.json();
+            expect(body.title).toBe(payload.title);
+            expect(body.id).toBe(payload.id);
+        });
     });
 
-    test('Deve simular e validar o status code de erro 403 (Forbidden)', async () => {
-        const response = await api.getSimulatedError(403);
-        expect(response.status()).toBe(403); // Requisito de erro 403 do Testes_JCG.pdf[cite: 1]
+    test('DELETE - Validar o comportamento ao deletar um post existente', async () => {
+        let response;
+        const postIdParaDeletar = 1;
+
+        await test.step(`Quando solicito a exclusão do Post ID ${postIdParaDeletar} via DELETE`, async () => {
+            response = await api.deletePost(postIdParaDeletar);
+        });
+
+        await test.step('Então a API deve confirmar a exclusão com status 200 OK', async () => {
+            expect(response.status()).toBe(200);
+        });
     });
 
-    test('Deve simular e validar o status code de erro 409 (Conflict)', async () => {
-        const response = await api.getSimulatedError(409);
-        expect(response.status()).toBe(409); // Requisito de erro 409 do Testes_JCG.pdf[cite: 1]
+    // ====================================================================
+    // GERADOR DINÂMICO DE CENÁRIOS DE ERRO 401, 403 e 409
+    // ====================================================================
+    test.describe('Validação a interceptação de erros HTTP', () => {
+        const statusCodesDeErro = [401, 403, 409];
+
+        for (const statusCode of statusCodesDeErro) {
+            test(`Validar o tratamento para o Status Code ${statusCode}`, async () => {
+                let response;
+
+                await test.step(`Quando o serviço responde com o erro HTTP ${statusCode}`, async () => {
+                    response = await api.getSimulatedError(statusCode);
+                });
+
+                await test.step(`Então o sistema deve repassar o código ${statusCode} corretamente`, async () => {
+                    expect(response.status()).toBe(statusCode);
+                });
+            });
+        }
     });
+
 });

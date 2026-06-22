@@ -1,12 +1,31 @@
 {
-  "api": {
-    "newUser": {
-      "name": "Morpheus QA",
-      "job": "Leader"
-    }
+  "usuarios": {
+    "valido": "standard_user",
+    "bloqueado": "locked_out_user"
   },
-  "ui": {
-    "expectedInventoryTitle": "Products",
-    "targetProductName": "Sauce Labs Backpack"
+  "produtos": {
+    "mochila": "sauce-labs-backpack"
+  },
+  "checkout": {
+    "nome": "Julio",
+    "sobrenome": "Arquiteto QA",
+    "cep": "06000-000"
+  },
+  "mensagens": {
+    "erroBloqueado": "Epic sadface: Sorry, this user has been locked out.",
+    "sucessoCompra": "Thank you for your order!"
+  },
+  "api": {
+    "novoPost": {
+      "title": "Desafio QA Senior",
+      "body": "Arquitetura limpa e simétrica no Playwright",
+      "userId": 1
+    },
+    "postAtualizado": {
+      "id": 1,
+      "title": "Desafio QA Senior - REVISADO",
+      "body": "Validando o metodo PUT com maestria",
+      "userId": 1
+    }
   }
 }
