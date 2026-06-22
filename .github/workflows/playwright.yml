@@ -1,61 +1,86 @@
-name: QA Senior Pipeline
+name: Desafio QA Senior Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   # ----------------------------------------------------
   # JOB 1: TESTES FUNCIONAIS (API + UI Web)
   # ----------------------------------------------------
   functional-tests:
+    name: Functional Tests - Playwright
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 20
-        
-    - name: Install dependencies
-      run: npm install
-      
-    - name: Create env file dynamically
-      run: |
-        echo "BASE_URL_API=https://jsonplaceholder.typicode.com" >> .env
-        echo "BASE_URL_UI=https://www.saucedemo.com" >> .env
-        echo "MOCK_URL_ERRORS=https://postman-echo.com/status" >> .env
-        echo "USER_UI=standard_user" >> .env
-        echo "PASSWORD_UI=secret_sauce" >> .env
 
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-      
-    - name: Run Playwright tests
-      run: npx playwright test
-      
-    - uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create environment file dynamically
+        run: |
+          cat <<EOF > .env
+          BASE_URL_API=https://jsonplaceholder.typicode.com
+          BASE_URL_UI=https://www.saucedemo.com
+          MOCK_URL_ERRORS=https://postman-echo.com/status
+          USER_UI=standard_user
+          PASSWORD_UI=secret_sauce
+          EOF
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: npx playwright test
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
 
   # ----------------------------------------------------
   # JOB 2: TESTES DE CARGA (k6) - RODANDO EM PARALELO
   # ----------------------------------------------------
   performance-tests:
+    name: Performance Tests - k6
+    timeout-minutes: 30
     runs-on: ubuntu-latest
+
+    env:
+      BASE_URL_API: https://jsonplaceholder.typicode.com
+
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Setup k6
-      uses: grafana/setup-k6-action@v1
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v1
 
-    - name: Run k6 Performance Test
-      run: k6 run k6/performance.js
-      env:
-        BASE_URL_API: https://jsonplaceholder.typicode.com
+      - name: Create k6 results directory
+        run: mkdir -p test-results/k6
+
+      - name: Run k6 performance test
+        run: k6 run --summary-export test-results/k6/k6-summary.json k6/performance.js
+
+      - name: Upload k6 summary
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: k6-summary
+          path: test-results/k6/
+          retention-days: 30
+          if-no-files-found: error
