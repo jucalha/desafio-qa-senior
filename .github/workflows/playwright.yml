@@ -27,7 +27,7 @@ jobs:
       run: |
         echo "BASE_URL_API=https://jsonplaceholder.typicode.com" >> .env
         echo "BASE_URL_UI=https://www.saucedemo.com" >> .env
-        echo "MOCK_URL_ERRORS=https://httpbin.org/status" >> .env
+        echo "MOCK_URL_ERRORS=https://postman-echo.com/status" >> .env
         echo "USER_UI=standard_user" >> .env
         echo "PASSWORD_UI=secret_sauce" >> .env
 
