@@ -133,8 +133,8 @@ A estrutura foi organizada por responsabilidade, facilitando manutenção, evolu
  ┃ ┣ 📂 api                 # Testes de API REST
  ┃ ┗ 📂 ui                  # Testes de UI Web
  ┣ 📜 .env.example          # Template de variáveis de ambiente
- ┣ 📜 playwright.config.ts  # Configuração global do Playwright
- ┗ 📜 package.json          # Dependências e scripts do projeto
+ ┣ 📜 package.json          # Dependências e scripts do projeto
+ ┗ 📜 playwright.config.ts  # Configuração global do Playwright
 ```
 
 ---

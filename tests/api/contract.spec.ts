@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { ApiHelper } from '../../src/support/apiHelper';
-import testData from '../../src/data/testData.json';
+import testData from '../../src/data/apiData.json';
 
 test.describe('Suíte de Testes de Contrato / Schema (API)', () => {
 

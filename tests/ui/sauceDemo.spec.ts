@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../src/pages/loginPage';
 import { InventoryPage } from '../../src/pages/inventoryPage';
-import testData from '../../src/data/testData.json';
+import testData from '../../src/data/uiData.json';
 
 test.describe('Suíte de Testes de UI - SauceDemo', () => {
 

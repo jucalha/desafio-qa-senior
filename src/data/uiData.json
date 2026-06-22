@@ -14,18 +14,5 @@
   "mensagens": {
     "erroBloqueado": "Epic sadface: Sorry, this user has been locked out.",
     "sucessoCompra": "Thank you for your order!"
-  },
-  "api": {
-    "novoPost": {
-      "title": "Desafio QA Senior",
-      "body": "Arquitetura limpa e simétrica no Playwright",
-      "userId": 1
-    },
-    "postAtualizado": {
-      "id": 1,
-      "title": "Desafio QA Senior - REVISADO",
-      "body": "Validando o metodo PUT com maestria",
-      "userId": 1
-    }
   }
 }
